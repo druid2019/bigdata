@@ -130,13 +130,12 @@ public class HbasedealApplication {
      */
     public static void deleteRowKey(String tableName, String rowKey) throws IOException {
         // 2. 创建连接
-        Connection conn = getHbaseConnection();
-        HTable hTable = new HTable(conn, tableName);
-        Delete delete = new Delete(rowKey.getBytes());
-        List<Delete> list = new ArrayList<Delete>();
-        list.add(delete);
+        Table table = conn.getTable(TableName.valueOf(tableName));
+        Delete delete = new Delete(rowKey.getBytes(rowKey));
+        List<Delete> deleteList = new ArrayList<>();
+        deleteList.add(delete);
         // 调用api,删除数据
-        hTable.delete(list);
+        table.delete(deleteList);
     }
 
     public static void main(String[] args) throws IOException {
