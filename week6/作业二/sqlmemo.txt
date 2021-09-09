@@ -1,0 +1,27 @@
+create table if not exists snap_face(rowkey int, name string, human_id string) partitioned by (day int);
+create table if not exists snap_face(rowkey int, name string, human_id string) partitioned by (day int) stored as Parquet;
+
+with tmp as (
+select 1 as rowkey, '张三' as name, 'zs' as human_id
+)insert overwrite table snap_face PARTITION (day=20210908) select rowkey, name, human_id from tmp;
+
+with tmp as (
+select 1 as rowkey, '张三' as name, 'zs' as human_id
+union all
+select 2 as rowkey, '李四' as name, 'ls' as human_id
+union all
+select 3 as rowkey, '王五' as name, 'ww' as human_id
+)insert overwrite table snap_face PARTITION (day=20210908) select rowkey, name, human_id from tmp;
+
+with tmp as (
+select 4 as rowkey, '赵六' as name, 'zl' as human_id
+)insert overwrite table snap_face PARTITION (day=20210909) select rowkey, name, human_id from tmp;
+
+set spark.sql.planChangeLog.level=WARN;
+select rowkey, name, human_id, day from snap_face;
+
+select name from (select rowkey, name, human_id, day from snap_face where day < 20210909) t where true and t.day = 20210908;
+
+
+select t.rowkey, t.name, 5 as num from (select rowkey, name, human_id, day from snap_face where 1 = 1 except select rowkey, name, human_id, day from
+snap_face where day = 20210909) t where t.name = '张三' order by num;

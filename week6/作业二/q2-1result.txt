@@ -1,0 +1,229 @@
+spark-sql> select name from (select rowkey, name, human_id, day from snap_face where day < 20210909) t where true and t.day = 20210908;
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Substitution has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Disable Hints has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Hints has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Simple Sanity Check has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.catalyst.analysis.Analyzer$ResolveRelations ===
+ 'Project ['name]                                            'Project ['name]
+ +- 'Filter (true AND ('t.day = 20210908))                   +- 'Filter (true AND ('t.day = 20210908))
+    +- 'SubqueryAlias t                                         +- 'SubqueryAlias t
+       +- 'Project ['rowkey, 'name, 'human_id, 'day]               +- 'Project ['rowkey, 'name, 'human_id, 'day]
+          +- 'Filter ('day < 20210909)                                +- 'Filter ('day < 20210909)
+!            +- 'UnresolvedRelation [snap_face], [], false               +- 'SubqueryAlias spark_catalog.default.snap_face
+!                                                                           +- 'UnresolvedCatalogRelation `default`.`snap_face`, org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe, [], false
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.execution.datasources.FindDataSourceTable ===
+ 'Project ['name]                                                                                                                             'Project ['name]
+ +- 'Filter (true AND ('t.day = 20210908))                                                                                                    +- 'Filter (true AND ('t.day = 20210908))
+    +- 'SubqueryAlias t                                                                                                                          +- 'SubqueryAlias t
+       +- 'Project ['rowkey, 'name, 'human_id, 'day]                                                                                                +- 'Project ['rowkey, 'name, 'human_id, 'day]
+          +- 'Filter ('day < 20210909)                                                                                                                 +- 'Filter ('day < 20210909)
+!            +- 'SubqueryAlias spark_catalog.default.snap_face                                                                                            +- SubqueryAlias spark_catalog.default.snap_face
+!               +- 'UnresolvedCatalogRelation `default`.`snap_face`, org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe, [], false                  +- HiveTableRelation [`default`.`snap_face`, org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe, Data Cols: [rowkey#24, name#25, human_id#26], Partition Cols: [day#27]]
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.catalyst.analysis.Analyzer$ResolveReferences ===
+!'Project ['name]                                                                                                                                                                                   Project [name#25]
+!+- 'Filter (true AND ('t.day = 20210908))                                                                                                                                                          +- Filter (true AND (day#27 = 20210908))
+!   +- 'SubqueryAlias t                                                                                                                                                                                +- SubqueryAlias t
+!      +- 'Project ['rowkey, 'name, 'human_id, 'day]                                                                                                                                                      +- Project [rowkey#24, name#25, human_id#26, day#27]
+!         +- 'Filter ('day < 20210909)                                                                                                                                                                       +- Filter (day#27 < 20210909)
+             +- SubqueryAlias spark_catalog.default.snap_face                                                                                                                                                   +- SubqueryAlias spark_catalog.default.snap_face
+                +- HiveTableRelation [`default`.`snap_face`, org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe, Data Cols: [rowkey#24, name#25, human_id#26], Partition Cols: [day#27]]                  +- HiveTableRelation [`default`.`snap_face`, org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe, Data Cols: [rowkey#24, name#25, human_id#26], Partition Cols: [day#27]]
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Result of Batch Resolution ===
+!'Project ['name]                                            Project [name#25]
+!+- 'Filter (true AND ('t.day = 20210908))                   +- Filter (true AND (day#27 = 20210908))
+!   +- 'SubqueryAlias t                                         +- SubqueryAlias t
+!      +- 'Project ['rowkey, 'name, 'human_id, 'day]               +- Project [rowkey#24, name#25, human_id#26, day#27]
+!         +- 'Filter ('day < 20210909)                                +- Filter (day#27 < 20210909)
+!            +- 'UnresolvedRelation [snap_face], [], false               +- SubqueryAlias spark_catalog.default.snap_face
+!                                                                           +- HiveTableRelation [`default`.`snap_face`, org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe, Data Cols: [rowkey#24, name#25, human_id#26], Partition Cols: [day#27]]
+          
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Apply Char Padding has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.hive.DetermineTableStats ===
+ Project [name#25]                                                                                                                                                                                  Project [name#25]
+ +- Filter (true AND (day#27 = 20210908))                                                                                                                                                           +- Filter (true AND (day#27 = 20210908))
+    +- SubqueryAlias t                                                                                                                                                                                 +- SubqueryAlias t
+       +- Project [rowkey#24, name#25, human_id#26, day#27]                                                                                                                                               +- Project [rowkey#24, name#25, human_id#26, day#27]
+          +- Filter (day#27 < 20210909)                                                                                                                                                                      +- Filter (day#27 < 20210909)
+             +- SubqueryAlias spark_catalog.default.snap_face                                                                                                                                                   +- SubqueryAlias spark_catalog.default.snap_face
+                +- HiveTableRelation [`default`.`snap_face`, org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe, Data Cols: [rowkey#24, name#25, human_id#26], Partition Cols: [day#27]]                  +- HiveTableRelation [`default`.`snap_face`, org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe, Data Cols: [rowkey#24, name#25, human_id#26], Partition Cols: [day#27]]
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.hive.RelationConversions ===
+ Project [name#25]                                                                                                                                                                                  Project [name#25]
+ +- Filter (true AND (day#27 = 20210908))                                                                                                                                                           +- Filter (true AND (day#27 = 20210908))
+    +- SubqueryAlias t                                                                                                                                                                                 +- SubqueryAlias t
+       +- Project [rowkey#24, name#25, human_id#26, day#27]                                                                                                                                               +- Project [rowkey#24, name#25, human_id#26, day#27]
+          +- Filter (day#27 < 20210909)                                                                                                                                                                      +- Filter (day#27 < 20210909)
+             +- SubqueryAlias spark_catalog.default.snap_face                                                                                                                                                   +- SubqueryAlias spark_catalog.default.snap_face
+!               +- HiveTableRelation [`default`.`snap_face`, org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe, Data Cols: [rowkey#24, name#25, human_id#26], Partition Cols: [day#27]]                  +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Result of Batch Post-Hoc Resolution ===
+ Project [name#25]                                                                                                                                                                                  Project [name#25]
+ +- Filter (true AND (day#27 = 20210908))                                                                                                                                                           +- Filter (true AND (day#27 = 20210908))
+    +- SubqueryAlias t                                                                                                                                                                                 +- SubqueryAlias t
+       +- Project [rowkey#24, name#25, human_id#26, day#27]                                                                                                                                               +- Project [rowkey#24, name#25, human_id#26, day#27]
+          +- Filter (day#27 < 20210909)                                                                                                                                                                      +- Filter (day#27 < 20210909)
+             +- SubqueryAlias spark_catalog.default.snap_face                                                                                                                                                   +- SubqueryAlias spark_catalog.default.snap_face
+!               +- HiveTableRelation [`default`.`snap_face`, org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe, Data Cols: [rowkey#24, name#25, human_id#26], Partition Cols: [day#27]]                  +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+          
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Normalize Alter Table has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Remove Unresolved Hints has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Nondeterministic has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch UDF has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch UpdateNullability has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Subquery has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Cleanup has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Metrics of Executed Rules ===
+Total number of runs: 219
+Total time: 0.031860308 seconds
+Total number of effective runs: 5
+Total time of effective runs: 0.021555394 seconds
+      
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Optimize Cache With CTE has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Eliminate Distinct has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.catalyst.analysis.EliminateSubqueryAliases ===
+ Project [name#25]                                                          Project [name#25]
+ +- Filter (true AND (day#27 = 20210908))                                   +- Filter (true AND (day#27 = 20210908))
+!   +- SubqueryAlias t                                                         +- Project [rowkey#24, name#25, human_id#26, day#27]
+!      +- Project [rowkey#24, name#25, human_id#26, day#27]                       +- Filter (day#27 < 20210909)
+!         +- Filter (day#27 < 20210909)                                              +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+!            +- SubqueryAlias spark_catalog.default.snap_face               
+!               +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet   
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Result of Batch Finish Analysis ===
+ Project [name#25]                                                          Project [name#25]
+ +- Filter (true AND (day#27 = 20210908))                                   +- Filter (true AND (day#27 = 20210908))
+!   +- SubqueryAlias t                                                         +- Project [rowkey#24, name#25, human_id#26, day#27]
+!      +- Project [rowkey#24, name#25, human_id#26, day#27]                       +- Filter (day#27 < 20210909)
+!         +- Filter (day#27 < 20210909)                                              +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+!            +- SubqueryAlias spark_catalog.default.snap_face               
+!               +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet   
+          
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Union has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch OptimizeLimitZero has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch LocalRelation early has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Pullup Correlated Expressions has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Subquery has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Replace Operators has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Aggregate has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.PushDownPredicates ===
+ Project [name#25]                                                    Project [name#25]
+!+- Filter (true AND (day#27 = 20210908))                             +- Project [rowkey#24, name#25, human_id#26, day#27]
+!   +- Project [rowkey#24, name#25, human_id#26, day#27]                 +- Filter ((day#27 < 20210909) AND (true AND (day#27 = 20210908)))
+!      +- Filter (day#27 < 20210909)                                        +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+!         +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet   
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.ColumnPruning ===
+ Project [name#25]                                                       Project [name#25]
+!+- Project [rowkey#24, name#25, human_id#26, day#27]                    +- Project [name#25]
+    +- Filter ((day#27 < 20210909) AND (true AND (day#27 = 20210908)))      +- Filter ((day#27 < 20210909) AND (true AND (day#27 = 20210908)))
+       +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet               +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.CollapseProject ===
+ Project [name#25]                                                       Project [name#25]
+!+- Project [name#25]                                                    +- Filter ((day#27 < 20210909) AND (true AND (day#27 = 20210908)))
+!   +- Filter ((day#27 < 20210909) AND (true AND (day#27 = 20210908)))      +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+!      +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet         
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.BooleanSimplification ===
+ Project [name#25]                                                    Project [name#25]
+!+- Filter ((day#27 < 20210909) AND (true AND (day#27 = 20210908)))   +- Filter ((day#27 < 20210909) AND (day#27 = 20210908))
+    +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet            +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Result of Batch Operator Optimization before Inferring Filters ===
+ Project [name#25]                                                    Project [name#25]
+!+- Filter (true AND (day#27 = 20210908))                             +- Filter ((day#27 < 20210909) AND (day#27 = 20210908))
+!   +- Project [rowkey#24, name#25, human_id#26, day#27]                 +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+!      +- Filter (day#27 < 20210909)                                  
+!         +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet   
+          
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.InferFiltersFromConstraints ===
+ Project [name#25]                                              Project [name#25]
+!+- Filter ((day#27 < 20210909) AND (day#27 = 20210908))        +- Filter (isnotnull(day#27) AND ((day#27 < 20210909) AND (day#27 = 20210908)))
+    +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet      +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Result of Batch Infer Filters ===
+ Project [name#25]                                              Project [name#25]
+!+- Filter ((day#27 < 20210909) AND (day#27 = 20210908))        +- Filter (isnotnull(day#27) AND ((day#27 < 20210909) AND (day#27 = 20210908)))
+    +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet      +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+          
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Operator Optimization after Inferring Filters has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Push extra predicate through join has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.execution.datasources.PruneFileSourcePartitions ===
+ Project [name#25]                                                                 Project [name#25]
+!+- Filter (isnotnull(day#27) AND ((day#27 < 20210909) AND (day#27 = 20210908)))   +- Filter ((isnotnull(day#27) AND (day#27 < 20210909)) AND (day#27 = 20210908))
+    +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet                         +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Result of Batch Early Filter and Projection Push-Down ===
+ Project [name#25]                                                                 Project [name#25]
+!+- Filter (isnotnull(day#27) AND ((day#27 < 20210909) AND (day#27 = 20210908)))   +- Filter ((isnotnull(day#27) AND (day#27 < 20210909)) AND (day#27 = 20210908))
+    +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet                         +- Relation[rowkey#24,name#25,human_id#26,day#27] parquet
+          
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Join Reorder has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Eliminate Sorts has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Decimal Optimizations has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch CaseWhen Count Distinct Aggregate Rewrite has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Single Type Distinct Aggregate Rewrite has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Distinct Aggregate Rewrite has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Object Expressions Optimization has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch LocalRelation has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Check Cartesian Products has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch RewriteSubquery has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch NormalizeFloatingNumbers has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch ReplaceUpdateFieldsExpression has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Window TopK Filter Push Down has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Optimize Metadata Only Query has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch PartitionPruning has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Pushdown Filters from PartitionPruning has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Cleanup filters that cannot be pushed down has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch Extract Python UDFs has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: Batch User Provided Optimizers has no effect.
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Metrics of Executed Rules ===
+Total number of runs: 195
+Total time: 0.038550008 seconds
+Total number of effective runs: 7
+Total time of effective runs: 0.031210228 seconds
+      
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.execution.ApplyColumnarRulesAndInsertTransitions ===
+ Project [name#25]                                                                                                                                                                                                                                                                                                                                            Project [name#25]
+!+- FileScan parquet default.snap_face[name#25,day#27] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex[hdfs://emr-header-1.cluster-242222:9000/user/hive/warehouse/snap_face/day=20210..., PartitionFilters: [isnotnull(day#27), (day#27 < 20210909), (day#27 = 20210908)], PushedFilters: [], ReadSchema: struct<name:string>   +- ColumnarToRow
+!                                                                                                                                                                                                                                                                                                                                                                +- FileScan parquet default.snap_face[name#25,day#27] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex[hdfs://emr-header-1.cluster-242222:9000/user/hive/warehouse/snap_face/day=20210..., PartitionFilters: [isnotnull(day#27), (day#27 < 20210909), (day#27 = 20210908)], PushedFilters: [], ReadSchema: struct<name:string>
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Applying Rule org.apache.spark.sql.execution.CollapseCodegenStages ===
+!Project [name#25]                                                                                                                                                                                                                                                                                                                                               *(1) Project [name#25]
+!+- ColumnarToRow                                                                                                                                                                                                                                                                                                                                                +- *(1) ColumnarToRow
+    +- FileScan parquet default.snap_face[name#25,day#27] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex[hdfs://emr-header-1.cluster-242222:9000/user/hive/warehouse/snap_face/day=20210..., PartitionFilters: [isnotnull(day#27), (day#27 < 20210909), (day#27 = 20210908)], PushedFilters: [], ReadSchema: struct<name:string>      +- FileScan parquet default.snap_face[name#25,day#27] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex[hdfs://emr-header-1.cluster-242222:9000/user/hive/warehouse/snap_face/day=20210..., PartitionFilters: [isnotnull(day#27), (day#27 < 20210909), (day#27 = 20210908)], PushedFilters: [], ReadSchema: struct<name:string>
+           
+21/09/09 13:56:05 WARN [main] PlanChangeLogger: 
+=== Result of Batch Preparations ===
+!Project [name#25]                                                                                                                                                                                                                                                                                                                                            *(1) Project [name#25]
+!+- FileScan parquet default.snap_face[name#25,day#27] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex[hdfs://emr-header-1.cluster-242222:9000/user/hive/warehouse/snap_face/day=20210..., PartitionFilters: [isnotnull(day#27), (day#27 < 20210909), (day#27 = 20210908)], PushedFilters: [], ReadSchema: struct<name:string>   +- *(1) ColumnarToRow
+!                                                                                                                                                                                                                                                                                                                                                                +- FileScan parquet default.snap_face[name#25,day#27] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex[hdfs://emr-header-1.cluster-242222:9000/user/hive/warehouse/snap_face/day=20210..., PartitionFilters: [isnotnull(day#27), (day#27 < 20210909), (day#27 = 20210908)], PushedFilters: [], ReadSchema: struct<name:string>
+          
+张三
+李四
+王五
+Time taken: 2.554 seconds, Fetched 3 row(s)
